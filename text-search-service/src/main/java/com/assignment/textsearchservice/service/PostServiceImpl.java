@@ -7,10 +7,9 @@ import com.assignment.textsearchservice.model.Post;
 import com.assignment.textsearchservice.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.TextCriteria;
-import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +20,6 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
     @Autowired
     private PostRepository repository;
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
     @Override
     public Post createPost(CreatePostDTO dto) {
@@ -45,6 +42,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Cacheable(value = "posts")
     public List<Post> getAllPosts() {
         List<Post> postList = repository.findAll();
         log.info("Successfully retrieved all posts count: {}", (long) postList.size());
@@ -52,6 +50,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Cacheable(value = "posts", key = "#prompt")
     public List<Post> getAllPostsByPrompt(String prompt) {
         String[] prompts = prompt.split(" ");
         return repository.findAllBy(new TextCriteria()

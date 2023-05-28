@@ -1,6 +1,7 @@
 package com.assignment.textsearchservice.utils;
 
 import com.assignment.textsearchservice.exception.PostNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,9 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 @RestControllerAdvice
+@Slf4j
 public class CustomExceptionHandler {
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ApiResponse<String>> handleAllExceptions(Exception ex, WebRequest request) {
+        log.error("Exception: ",ex);
         ApiResponse<String> apiResponse = new ApiResponse<>(ex.getMessage(),
                 request.getDescription(false), HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -26,7 +29,7 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public final ResponseEntity handleValidationException(MethodArgumentNotValidException e, WebRequest request) {
+    public final ResponseEntity<ApiResponse<String>> handleValidationException(MethodArgumentNotValidException e, WebRequest request) {
         FieldError objectError = e.getBindingResult().getFieldError();
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).
                 body(new ApiResponse<>(objectError.getDefaultMessage()));
