@@ -54,7 +54,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> getAllPostsByPrompt(String prompt) {
         String[] prompts = prompt.split(" ");
-        TextQuery textQuery = TextQuery.queryText(new TextCriteria().matchingAny(prompts)).sortByScore();
-        return repository.findAllBy(new TextCriteria().matchingAny(prompt), Sort.by("name","description"));
+        return repository.findAllBy(new TextCriteria()
+                .matchingAny(prompt), Sort.by("name", "description"));
     }
 }
